@@ -112,7 +112,7 @@ public class Board {
 			for (int j=0; j<i+1; j++) {
 				if (!((i == depth-1 && j == 0) || (i == depth-1 && j == depth-1))) {		  // Skip the corner positions
 					if (!myBoard[i][j]) {			// No peg exists at the current positions
-						if (!(i-2 < 0)) {				// Check that NE move is not outside of the board
+						if (!(i-2 < 0 || j > i-2)) {				// Check that NE move is not outside of the board
 							if (myBoard[i-1][j]) {		// Check NE adjacent peg exists for move to exist
 								if (myBoard[i-2][j]) {
 									validForwardMoves.add(new Board(this).move(i-2, j, i, j));
@@ -126,7 +126,7 @@ public class Board {
 								}
 							}
 						}
-						if (!(i+2 > depth-1 || j+2 > i)) {	// Check the SE move is not outside of the board
+						if (!(i+2 > depth-1 || j+2 > i+2)) {	// Check the SE move is not outside of the board
 							if (myBoard[i+1][j+1]){			// Check SE adjacent peg exists for move to exist
 								if (myBoard[i+2][j+2]) {
 									validForwardMoves.add(new Board(this).move(i+2, j+2, i, j));
