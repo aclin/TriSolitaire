@@ -41,9 +41,14 @@ public class Game {
 	public boolean solve() {
 		Board parent;
 		Board child;
-		path.push(startBoard);
+		if (dfs(startBoard)) {
+			path.push(startBoard);
+			return true;
+		} else {
+			return false;
+		}
 		//startBoard.findValidForwardMoves();
-		
+		/*
 		while (!path.isEmpty()) {
 			parent = (Board) path.peek();
 			parent.findValidForwardMoves();
@@ -57,7 +62,23 @@ public class Game {
 		}
 		
 		return false;
-		
+		*/
+	}
+	
+	private boolean dfs(Board node) {
+		Board b;
+		if (node.isGoal())
+			return true;
+		if (!node.findValidForwardMoves())
+			return false;
+		while (node.hasNextMove()) {
+			b = node.nextMove();
+			if (dfs(b)) {
+				path.push(b);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void printValidMoves() {

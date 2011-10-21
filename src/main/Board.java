@@ -49,7 +49,11 @@ public class Board {
 		return (Board) validForwardMoves.remove(validForwardMoves.size()-1);
 	}
 	
-	public void findValidForwardMoves() {
+	public boolean hasNextMove() {
+		return validForwardMoves.size() > 0;
+	}
+	
+	public boolean findValidForwardMoves() {
 		// Pegs in the corners only have 2 possible moves, so they are easy to check for first
 		// Start with the top corner
 		if (!myBoard[0][0]) {				// no peg exists at the top-most position
@@ -98,6 +102,8 @@ public class Board {
 				}
 			}
 		}
+		
+		return validForwardMoves.size() > 0;
 	}
 	
 	private Board move(int sRow, int sCol, int tRow, int tCol) {

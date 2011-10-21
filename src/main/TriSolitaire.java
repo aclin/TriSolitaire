@@ -13,6 +13,7 @@ public class TriSolitaire {
 			System.out.println("Solution path:");
 			while(!peggy.path.empty()) {
 				((Board) peggy.path.pop()).printBoard();
+				System.out.println("======");
 			}
 			/*if (peggy.path.empty()) {
 				System.out.println("wtf...");
