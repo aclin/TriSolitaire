@@ -55,6 +55,7 @@ public class Board {
 	
 	public boolean findValidForwardMoves() {
 		// Pegs in the corners only have 2 possible moves, so they are easy to check for first
+		// CORNER MOVES START
 		// Start with the top corner
 		if (!myBoard[0][0]) {				// no peg exists at the top-most position
 			if (myBoard[1][0]) {
@@ -102,6 +103,8 @@ public class Board {
 				}
 			}
 		}
+		// CORNER MOVES END
+		
 		
 		return validForwardMoves.size() > 0;
 	}

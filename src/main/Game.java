@@ -38,47 +38,77 @@ public class Game {
 		
 	}
 	
+	/*
 	public boolean solve() {
-		Board parent;
-		Board child;
+		
+		// Calls recursive Depth-First Search
 		if (dfs(startBoard)) {
 			path.push(startBoard);
 			return true;
 		} else {
 			return false;
 		}
-		//startBoard.findValidForwardMoves();
-		/*
-		while (!path.isEmpty()) {
-			parent = (Board) path.peek();
-			parent.findValidForwardMoves();
-			child = parent.nextMove();
-			if (child.isGoal())
-				return true;
-			if (path.search(child) != -1)
-				continue;
-			path.push(child);
-			child.findValidForwardMoves();
-		}
-		
-		return false;
-		*/
 	}
+	*/
 	
-	private boolean dfs(Board node) {
-		Board b;
-		if (node.isGoal())
-			return true;
-		if (!node.findValidForwardMoves())
-			return false;
-		while (node.hasNextMove()) {
-			b = node.nextMove();
-			if (dfs(b)) {
-				path.push(b);
-				return true;
+	// Iterative Depth-First Search
+	public boolean solve() {
+		Board parent;
+		Board child;
+		
+		path.push(startBoard);
+		startBoard.findValidForwardMoves();
+		
+		while (!path.isEmpty()) {
+			parent = (Board) path.pop();
+			if (parent.hasNextMove()) {
+				child = parent.nextMove();
+				if (child.isGoal()){
+					path.push(parent);
+					path.push(child);
+					reversePath();
+					return true;
+				}
+				if (path.search(child) != -1)
+					continue;
+				path.push(parent);
+				path.push(child);
+				child.findValidForwardMoves();
 			}
 		}
 		return false;
+	}
+	
+	// Recursive DFS
+	private boolean dfs(Board node) {
+		Board b;
+		// Check if the current node (board) is the goal state (one peg left)
+		if (node.isGoal())
+			return true;
+		// Check if the current node (board) has any children (has any moves available)
+		if (!node.findValidForwardMoves())
+			return false;
+		while (node.hasNextMove()) {
+			// While current node (board) has one child (available move)
+			b = node.nextMove();
+			// Do DFS on the subtree with the child as root
+			if (dfs(b)) {
+				// Put this node on the path if a depth-first search of it returns a goal state
+				path.push(b);
+				return true;
+			}
+			// If DFS on the subtree returns no goal state, ignore this node, and continue with the next child node
+		}
+		return false;
+	}
+	
+	private void reversePath() {
+		Stack<Board> tmp = new Stack<Board>();
+		while (!path.empty()) {
+			// Move everything in path to tmp in reverse order
+			tmp.push((Board) path.pop());
+		}
+		path = tmp;
 	}
 	
 	public void printValidMoves() {
