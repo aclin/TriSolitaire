@@ -18,6 +18,8 @@ public class TriSolitaire {
 			/*if (peggy.path.empty()) {
 				System.out.println("wtf...");
 			}*/
+		} else {
+			System.out.println("Did not find a top single peg solution");
 		}
 	}
 }
