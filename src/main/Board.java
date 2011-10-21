@@ -105,6 +105,43 @@ public class Board {
 		}
 		// CORNER MOVES END
 		
+		// Now check all other positions
+		// Since the board is triangular, pegs can enter a position from 6 different directions:
+		// (In clockwise order:) NE, E, SE, SW, W, NW 
+		for (int i=1; i<depth; i++) {			// We skip the peg at (0,0) since already checked it above
+			for (int j=0; j<i+1; i++) {
+				if (!((i == depth-1 && j == 0) || (i == depth-1 && j == depth-1))) {		  // Skip the corner positions
+					if (!myBoard[i][j]) {			// No peg exists at the current positions
+						if (!(i-2 < 0 ||
+								j+2 > i ||
+								i+2 > depth-1 ||
+								j-2 < 0)){}
+						if (!(i-2 < 0)) {				// Check that NE move is not outside of the board
+							if (myBoard[i-1][j]) {		// Check NE adjacent peg exists for move to exist
+								
+							}
+						}
+						if (!(j+2 > i)) {				// Check the E move is not outside of the board
+							if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
+								
+							}
+						}
+						if (myBoard[i+1][j+1]){		// Check SE adjacent peg exists for move to exist
+							
+						}
+						if (myBoard[i+1][j]){		// Check SW adjacent peg exists for move to exist
+							
+						}
+						if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
+							
+						}
+						if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
+							
+						}
+					}
+				}
+			}
+		}		
 		
 		return validForwardMoves.size() > 0;
 	}
