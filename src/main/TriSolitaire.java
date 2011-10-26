@@ -11,7 +11,8 @@ public class TriSolitaire {
 		System.out.println();
 		//peggy.printValidMoves();
 		
-		if (peggy.solve()) {
+		//if (peggy.solve()) {
+		if (peggy.dfidSolve()) {
 			System.out.println("SOLVED!");
 			System.out.println("Solution path:");
 			while(!peggy.path.empty()) {
