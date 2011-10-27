@@ -191,6 +191,10 @@ public class Board {
 		}
 	}
 	
+	public int validMovesCount() {
+		return validForwardMoves.size();
+	}
+	
 	public void printValidMoves() {
 		findValidForwardMoves();
 		System.out.println("Valid moves from the above configuration are:");
@@ -198,5 +202,9 @@ public class Board {
 			validForwardMoves.elementAt(i).printBoard();
 			System.out.println("and");
 		}
+	}
+	
+	public void clearMovesList() {
+		validForwardMoves.clear();
 	}
 }

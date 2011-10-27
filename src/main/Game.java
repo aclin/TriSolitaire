@@ -87,6 +87,7 @@ public class Game {
 		while (limit < cutOffDepth) {
 			if (dfid(limit))
 				return true;
+			startBoard.clearMovesList();
 			limit++;
 		}
 		return false;
@@ -95,15 +96,20 @@ public class Game {
 		Board parent;
 		Board child;
 		
-		int length = 1;
+		int length = 0;
 		
 		path.push(startBoard);
 		startBoard.findValidForwardMoves();
 		
 		while (!path.isEmpty()) {
 			parent = (Board) path.pop();
-			length--;
+			if (length > limit) {
+				System.out.println("Length greater than limit");
+				System.out.println("length: " + length + " Limit: " + limit);
+				continue;
+			}
 			if (parent.hasNextMove()) {
+				System.out.println("Number of valid moves: " + parent.validMovesCount());
 				child = parent.nextMove();
 				length++;
 				if (child.isGoal()){
@@ -114,11 +120,12 @@ public class Game {
 				}
 				if (path.search(child) != -1)
 					continue;
-				if (length > limit)
-					continue;
+				
 				path.push(parent);
 				path.push(child);
 				child.findValidForwardMoves();
+			} else {
+				length--;
 			}
 		}
 		return false;
@@ -153,7 +160,7 @@ public class Game {
 			cutOffDepth += i;
 		}
 		
-		cutOffDepth -= 2;
+		//cutOffDepth -= 2;
 	}
 	
 	private void reversePath() {
