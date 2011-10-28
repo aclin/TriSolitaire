@@ -6,8 +6,14 @@ import java.util.*;
 public class Game {
 	
 	Board startBoard;
+	Board goalBoard;
+	
 	int goalRow, goalCol;
+	
 	Stack<Board> path = new Stack<Board>();
+	Stack<Board> forwardPath = new Stack<Board>();
+	Stack<Board> backwardPath = new Stack<Board>();
+	Stack<Board> halfway = new Stack<Board>();
 	
 	int cutOffDepth;
 	
@@ -46,6 +52,7 @@ public class Game {
 						System.out.println("Peg position outside of board");
 						System.exit(1);
 					}
+					goalBoard = new Board(goalRow, goalCol, d);
 				} catch (NumberFormatException nfe) {
 					System.err.println("Error: Goal peg position not a number");
 					System.err.println("Error: " + nfe.getMessage());
@@ -125,7 +132,7 @@ public class Game {
 		while (limit < cutOffDepth) {
 			if (dfid(limit))
 				return true;
-			startBoard.clearMovesList();
+			startBoard.clearForwardMovesList();
 			limit++;
 		}
 		return false;
@@ -133,7 +140,6 @@ public class Game {
 	public boolean dfid(int limit) {
 		Board parent;
 		Board child;
-		
 		int length = 0;
 		
 		path.push(startBoard);
@@ -141,15 +147,17 @@ public class Game {
 		
 		while (!path.isEmpty()) {
 			parent = (Board) path.pop();
-			if (length > limit) {
-				//System.out.println("Length greater than limit");
-				//System.out.println("length: " + length + " Limit: " + limit);
-				continue;
-			}
+			 
 			if (parent.hasNextMove()) {
 				//System.out.println("Number of valid moves: " + parent.validMovesCount());
-				child = parent.nextMove();
 				length++;
+				if (length > limit) {
+					//System.out.println("Length greater than limit");
+					//System.out.println("length: " + length + " Limit: " + limit);
+					length = length - 2;
+					continue;
+				}
+				child = parent.nextMove();
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
 					path.push(child);
@@ -165,6 +173,97 @@ public class Game {
 				length--;
 			}
 		}
+		return false;
+	}
+	
+	// Bi-directional Depth-First Iterative Deepening Search
+	public boolean biDfidSolve() {
+		int limit = 0;
+		Board interim;
+		while (limit < cutOffDepth) {
+			if (biDfid(goalBoard, true, limit))
+				return true;
+			while (!halfway.isEmpty()) {
+				interim = halfway.pop();
+				if (biDfid(interim, false, limit))
+					return true;
+				if (biDfid(interim, false, limit+1))
+					return true;
+			}
+			
+			startBoard.clearForwardMovesList();
+			limit++;
+		}
+		return false;
+	}
+	
+	public boolean biDfid(Board goal, boolean forward, int limit) {
+		Board parent;
+		Board child;
+		
+		int length = 0;
+		
+		if (forward) {						// We're searching forward
+			forwardPath.push(startBoard);
+			startBoard.findValidForwardMoves();
+			System.out.println("forward");
+			while (!forwardPath.isEmpty()) {
+				parent = forwardPath.pop();
+				
+				if (parent.hasNextMove()) {
+					length++;
+					if (length > limit) {
+						length = length - 2;
+						halfway.push(parent);
+						continue;
+					}
+					child = parent.nextMove();
+					if (child.isGoal(goalRow, goalCol)){
+						forwardPath.push(parent);
+						forwardPath.push(child);
+						return true;
+					}
+					if (forwardPath.search(child) != -1)
+						continue;
+					
+					forwardPath.push(parent);
+					forwardPath.push(child);
+					child.findValidForwardMoves();
+				} else {
+					length--;
+				}
+			}
+		} else {							// We're searching backward
+			backwardPath.push(goalBoard);
+			goalBoard.findValidBackwardMoves();
+			System.out.println("backward");
+			while (!backwardPath.isEmpty()) {
+				parent = backwardPath.pop();
+				
+				if (parent.hasPrevMove()) {
+					length++;
+					if (length > limit) {
+						length = length - 2;
+						continue;
+					}
+					child = parent.prevMove();
+					if (child.isGoal(goal)){
+						backwardPath.push(parent);
+						backwardPath.push(child);
+						return true;
+					}
+					if (backwardPath.search(child) != -1)
+						continue;
+					
+					backwardPath.push(parent);
+					backwardPath.push(child);
+					child.findValidBackwardMoves();
+				} else {
+					length--;
+				}
+			}
+		}
+		
 		return false;
 	}
 	
@@ -185,6 +284,7 @@ public class Game {
 		}
 		path = tmp;
 	}
+	
 	
 	public void printValidMoves() {
 		startBoard.printValidMoves();

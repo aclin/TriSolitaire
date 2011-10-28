@@ -14,14 +14,19 @@ public class TriSolitaire {
 		
 		startTime = System.nanoTime();
 		//if (peggy.dfsSolve()) {
-		if (peggy.dfidSolve()) {
+		//if (peggy.dfidSolve()) {
+		if (peggy.biDfidSolve()) {
 			runTime = System.nanoTime() - startTime;
 			System.out.println("SOLVED!");
 			System.out.println("Time required: " + runTime);
 			System.out.println("Solution path:");
-			peggy.reversePath();
+			//peggy.reversePath();
 			while(!peggy.path.empty()) {
 				((Board) peggy.path.pop()).printBoard();
+				System.out.println("=============");
+			}
+			while(!peggy.backwardPath.empty()) {
+				((Board) peggy.backwardPath.pop()).printBoard();
 				System.out.println("=============");
 			}
 		} else {
