@@ -15,6 +15,9 @@ import java.util.*;
 
 public class Board {
 	
+	public final static int GOAL = 0;
+	public final static int START = 1;
+	
 	boolean[][] myBoard;
 	int depth;
 	Vector<Board> validForwardMoves = new Vector<Board>();
@@ -169,14 +172,19 @@ public class Board {
 		return this;
 	}
 	
-	public boolean isGoal() {
-		boolean topOne = false;
+	public boolean isGoal(int gRow, int gCol) {
+		// Flip the boolean at the goal position
+		// Then OR everything with a false value.
+		// If the final value is still false,
+		// then there was only one peg at the goal position.
 		boolean restZero = false;
-		topOne = topOne | myBoard[0][0];
-		for (int i=1; i<depth; i++)
+		myBoard[gRow][gCol] = !myBoard[gRow][gCol];
+		for (int i=0; i<depth; i++)
 			for (int j=0; j<i+1; j++)
 				restZero = restZero | myBoard[i][j];
-		return topOne == true && restZero == false;
+		// Flip the boolean at the goal position back
+		myBoard[gRow][gCol] = !myBoard[gRow][gCol];
+		return !restZero;
 	}
 	
 	public void printBoard() {
