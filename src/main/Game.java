@@ -126,6 +126,31 @@ public class Game {
 		return false;
 	}
 	
+	// New DFS move search implementation
+	public boolean dfsSolve2() {
+		Board parent;
+		Board child;
+		
+		path.push(startBoard);
+		
+		while (!path.isEmpty()) {
+			parent = (Board) path.pop();
+			if (parent.hasNextMove2()) {
+				child = parent.nextMove2();
+				if (child.isGoal(goalRow, goalCol)){
+					path.push(parent);
+					path.push(child);
+					return true;
+				}
+				if (path.search(child) != -1)
+					continue;
+				path.push(parent);
+				path.push(child);
+			}
+		}
+		return false;
+	}
+	
 	// Depth-First Iterative Deepening Search with a limit
 	public boolean dfidSolve() {
 		int limit = 0;

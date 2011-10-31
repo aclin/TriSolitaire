@@ -21,12 +21,12 @@ public class Board {
 	Vector<Board> validBackwardMoves = new Vector<Board>();
 	
 	int currentRow, currentCol;
-	boolean dirNE = false;
-	boolean dirE = false;
-	boolean dirSE = false;
-	boolean dirSW = false;
-	boolean dirW = false;
-	boolean dirNW = false;
+	boolean dirNE = true;
+	boolean dirE = true;
+	boolean dirSE = true;
+	boolean dirSW = true;
+	boolean dirW = true;
+	boolean dirNW = true;
 	Board nextMove;
 	Stack<Integer> emptySlots = new Stack<Integer>();
 	
@@ -41,6 +41,7 @@ public class Board {
 			for (int j=0; j<i+1; j++)
 				myBoard[i][j] = other.myBoard[i][j];
 		}
+		findEmptySlots();
 	}
 	
 	public Board(int gRow, int gCol, int d) {
@@ -63,10 +64,15 @@ public class Board {
 			}
 		}
 		depth = d;
+		findEmptySlots();
 	}
 	
 	public Board nextMove() {
 		return validForwardMoves.remove(validForwardMoves.size()-1);
+	}
+	
+	public Board nextMove2() {
+		return nextMove;
 	}
 	
 	public Board prevMove() {
@@ -78,53 +84,91 @@ public class Board {
 	}
 	
 	public boolean hasNextMove2() {
-		if (emptySlots.isEmpty())
-			return false;
-		currentRow = emptySlots.pop();
-		currentCol = emptySlots.pop();
-		if (!(currentRow-2 < 0 || currentCol > currentRow-2)) {				// Check that NE move is not outside of the board
-			if (myBoard[currentRow-1][currentCol]) {		// Check NE adjacent peg exists for move to exist
-				if (myBoard[currentRow-2][currentCol]) {
-					nextMove = new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol);
-					validForwardMoves.add(new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol));
+		while (!emptySlots.isEmpty()) {
+			if (!dirNE) {			// Check if the NE direction move has already been done/checked
+				if (!(currentRow-2 < 0 || currentCol > currentRow-2)) {				// Check that NE move is not outside of the board
+					if (myBoard[currentRow-1][currentCol]) {		// Check NE adjacent peg exists for move to exist
+						if (myBoard[currentRow-2][currentCol]) {
+							nextMove = new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol);
+							dirNE = true;
+							return true;
+						}
+					}
 				}
 			}
-		}
-		if (!(j+2 > i)) {				// Check the E move is not outside of the board
-			if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
-				if (myBoard[i][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j+2, i, j));
+			dirNE = true;
+			
+			if (!dirE) {
+				if (!(currentCol+2 > currentRow)) {				// Check the E move is not outside of the board
+					if (myBoard[currentRow][currentCol+1]){		// Check E adjacent peg exists for move to exist
+						if (myBoard[currentRow][currentCol+2]) {
+							nextMove = new Board(this).forwardMove(currentRow, currentCol+2, currentRow, currentCol);
+							dirE = true;
+							return true;
+						}
+					}
 				}
 			}
-		}
-		if (!(i+2 > depth-1 || j+2 > i+2)) {	// Check the SE move is not outside of the board
-			if (myBoard[i+1][j+1]){			// Check SE adjacent peg exists for move to exist
-				if (myBoard[i+2][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j+2, i, j));
+			dirE = true;
+			
+			if (!dirSE) {
+				if (!(currentRow+2 > depth-1 || currentCol+2 > currentRow+2)) {	// Check the SE move is not outside of the board
+					if (myBoard[currentRow+1][currentCol+1]){			// Check SE adjacent peg exists for move to exist
+						if (myBoard[currentRow+2][currentCol+2]) {
+							nextMove = new Board(this).forwardMove(currentRow+2, currentCol+2, currentRow, currentCol);
+							dirSE = true;
+							return true;
+						}
+					}
 				}
 			}
-		}
-		if (!(i+2 > depth-1)) {			// Check the SW move is not outside of the board
-			if (myBoard[i+1][j]) {		// Check SW adjacent peg exists for move to exist
-				if (myBoard[i+2][j]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j, i, j));
+			dirSE = true;
+			
+			if (!dirSW) {
+				if (!(currentRow+2 > depth-1)) {			// Check the SW move is not outside of the board
+					if (myBoard[currentRow+1][currentCol]) {		// Check SW adjacent peg exists for move to exist
+						if (myBoard[currentRow+2][currentCol]) {
+							nextMove = new Board(this).forwardMove(currentRow+2, currentCol, currentRow, currentCol);
+							dirSW = true;
+							return true;
+						}
+					}
 				}
 			}
-		}
-		if (!(j-2 < 0)) {				// Check the W move is not outside of the board
-			if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
-				if (myBoard[i][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
+			dirSW = true;
+			
+			if (!dirW) {
+				if (!(currentCol-2 < 0)) {				// Check the W move is not outside of the board
+					if (myBoard[currentRow][currentCol-1]){		// Check W adjacent peg exists for move to exist
+						if (myBoard[currentRow][currentCol-2]) {
+							nextMove = new Board(this).forwardMove(currentRow, currentCol-2, currentRow, currentCol);
+							dirW = true;
+							return true;
+						}
+					}
 				}
 			}
-		}
-		if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
-			if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
-				if (myBoard[i-2][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
+			dirW = true;
+			
+			if (!dirNW) {
+				if (!(currentRow-2 < 0 || currentCol-2 < 0)) {	// Check the NW move is not outside of the board
+					if (myBoard[currentRow-1][currentCol-1]){		// Check NW adjacent peg exists for move to exist
+						if (myBoard[currentRow-2][currentCol-2]) {
+							nextMove = new Board(this).forwardMove(currentRow-2, currentCol-2, currentRow, currentCol);
+							dirNW = true;
+							return true;
+						}
+					}
 				}
 			}
+			dirNW = true;
+			
+			currentRow = emptySlots.pop();
+			currentCol = emptySlots.pop();
+			resetCheckFlags();
 		}
+		
+		return false;
 	}
 	
 	public boolean hasPrevMove() {
@@ -370,6 +414,15 @@ public class Board {
 					emptySlots.push(j);
 					emptySlots.push(i);
 				}
+	}
+	
+	private void resetCheckFlags() {
+		dirNE = false;
+		dirE = false;
+		dirSE = false;
+		dirSW = false;
+		dirW = false;
+		dirNW = false;
 	}
 	
 	public boolean isGoal(int gRow, int gCol) {
