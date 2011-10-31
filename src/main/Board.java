@@ -20,6 +20,16 @@ public class Board {
 	Vector<Board> validForwardMoves = new Vector<Board>();
 	Vector<Board> validBackwardMoves = new Vector<Board>();
 	
+	int currentRow, currentCol;
+	boolean dirNE = false;
+	boolean dirE = false;
+	boolean dirSE = false;
+	boolean dirSW = false;
+	boolean dirW = false;
+	boolean dirNW = false;
+	Board nextMove;
+	Stack<Integer> emptySlots = new Stack<Integer>();
+	
 	public Board() {
 		
 	}
@@ -65,6 +75,56 @@ public class Board {
 	
 	public boolean hasNextMove() {
 		return validForwardMoves.size() > 0;
+	}
+	
+	public boolean hasNextMove2() {
+		if (emptySlots.isEmpty())
+			return false;
+		currentRow = emptySlots.pop();
+		currentCol = emptySlots.pop();
+		if (!(currentRow-2 < 0 || currentCol > currentRow-2)) {				// Check that NE move is not outside of the board
+			if (myBoard[currentRow-1][currentCol]) {		// Check NE adjacent peg exists for move to exist
+				if (myBoard[currentRow-2][currentCol]) {
+					nextMove = new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol);
+					validForwardMoves.add(new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol));
+				}
+			}
+		}
+		if (!(j+2 > i)) {				// Check the E move is not outside of the board
+			if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
+				if (myBoard[i][j+2]) {
+					validForwardMoves.add(new Board(this).forwardMove(i, j+2, i, j));
+				}
+			}
+		}
+		if (!(i+2 > depth-1 || j+2 > i+2)) {	// Check the SE move is not outside of the board
+			if (myBoard[i+1][j+1]){			// Check SE adjacent peg exists for move to exist
+				if (myBoard[i+2][j+2]) {
+					validForwardMoves.add(new Board(this).forwardMove(i+2, j+2, i, j));
+				}
+			}
+		}
+		if (!(i+2 > depth-1)) {			// Check the SW move is not outside of the board
+			if (myBoard[i+1][j]) {		// Check SW adjacent peg exists for move to exist
+				if (myBoard[i+2][j]) {
+					validForwardMoves.add(new Board(this).forwardMove(i+2, j, i, j));
+				}
+			}
+		}
+		if (!(j-2 < 0)) {				// Check the W move is not outside of the board
+			if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
+				if (myBoard[i][j-2]) {
+					validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
+				}
+			}
+		}
+		if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
+			if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
+				if (myBoard[i-2][j-2]) {
+					validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
+				}
+			}
+		}
 	}
 	
 	public boolean hasPrevMove() {
@@ -301,6 +361,15 @@ public class Board {
 		myBoard[tRow][tCol] = true;				// Add a peg at the target position (tRow, tCol)
 		myBoard[(sRow + tRow)/2][(sCol + tCol)/2] = true;	// Remove the peg in between that was jumped over
 		return this;
+	}
+	
+	private void findEmptySlots() {
+		for (int i=0; i<depth; i++)
+			for (int j=0; j<i+1; j++)
+				if (!myBoard[i][j]) {
+					emptySlots.push(j);
+					emptySlots.push(i);
+				}
 	}
 	
 	public boolean isGoal(int gRow, int gCol) {

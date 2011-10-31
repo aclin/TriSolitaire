@@ -99,7 +99,7 @@ public class Game {
 		return false;
 	}
 	
-	// Iterative Depth-First Search
+	// Iterative Depth-First Search (NOT Iterative Deepening)
 	public boolean dfsSolve() {
 		Board parent;
 		Board child;
