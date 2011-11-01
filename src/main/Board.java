@@ -77,56 +77,6 @@ public class Board {
 		return validForwardMoves.size() > 0;
 	}
 	
-	public boolean hasNextMove2() {
-		if (emptySlots.isEmpty())
-			return false;
-		currentRow = emptySlots.pop();
-		currentCol = emptySlots.pop();
-		if (!(currentRow-2 < 0 || currentCol > currentRow-2)) {				// Check that NE move is not outside of the board
-			if (myBoard[currentRow-1][currentCol]) {		// Check NE adjacent peg exists for move to exist
-				if (myBoard[currentRow-2][currentCol]) {
-					nextMove = new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol);
-					validForwardMoves.add(new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol));
-				}
-			}
-		}
-		if (!(j+2 > i)) {				// Check the E move is not outside of the board
-			if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
-				if (myBoard[i][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j+2, i, j));
-				}
-			}
-		}
-		if (!(i+2 > depth-1 || j+2 > i+2)) {	// Check the SE move is not outside of the board
-			if (myBoard[i+1][j+1]){			// Check SE adjacent peg exists for move to exist
-				if (myBoard[i+2][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j+2, i, j));
-				}
-			}
-		}
-		if (!(i+2 > depth-1)) {			// Check the SW move is not outside of the board
-			if (myBoard[i+1][j]) {		// Check SW adjacent peg exists for move to exist
-				if (myBoard[i+2][j]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j, i, j));
-				}
-			}
-		}
-		if (!(j-2 < 0)) {				// Check the W move is not outside of the board
-			if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
-				if (myBoard[i][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
-				}
-			}
-		}
-		if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
-			if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
-				if (myBoard[i-2][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
-				}
-			}
-		}
-	}
-	
 	public boolean hasPrevMove() {
 		return validBackwardMoves.size() > 0;
 	}

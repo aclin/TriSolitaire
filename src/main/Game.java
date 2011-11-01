@@ -140,6 +140,7 @@ public class Game {
 	public boolean dfid(int limit) {
 		Board parent;
 		Board child;
+		
 		int length = 0;
 		
 		path.push(startBoard);
@@ -147,17 +148,16 @@ public class Game {
 		
 		while (!path.isEmpty()) {
 			parent = (Board) path.pop();
-			 
+			if (length > limit) {
+				//System.out.println("Length greater than limit");
+				//System.out.println("length: " + length + " Limit: " + limit);
+				length -= 2;
+				continue;
+			}
 			if (parent.hasNextMove()) {
 				//System.out.println("Number of valid moves: " + parent.validMovesCount());
-				length++;
-				if (length > limit) {
-					//System.out.println("Length greater than limit");
-					//System.out.println("length: " + length + " Limit: " + limit);
-					length = length - 2;
-					continue;
-				}
 				child = parent.nextMove();
+				length++;
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
 					path.push(child);
@@ -206,18 +206,17 @@ public class Game {
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
 			startBoard.findValidForwardMoves();
-			System.out.println("forward");
 			while (!forwardPath.isEmpty()) {
 				parent = forwardPath.pop();
-				
+				if (length > limit) {
+					length -= 2;
+					halfway.push(parent);
+					System.out.println("forward");
+					continue;
+				}
 				if (parent.hasNextMove()) {
-					length++;
-					if (length > limit) {
-						length = length - 2;
-						halfway.push(parent);
-						continue;
-					}
 					child = parent.nextMove();
+					length++;
 					if (child.isGoal(goalRow, goalCol)){
 						forwardPath.push(parent);
 						forwardPath.push(child);
@@ -236,17 +235,16 @@ public class Game {
 		} else {							// We're searching backward
 			backwardPath.push(goalBoard);
 			goalBoard.findValidBackwardMoves();
-			System.out.println("backward");
 			while (!backwardPath.isEmpty()) {
 				parent = backwardPath.pop();
-				
+				System.out.println("backward");
+				if (length > limit) {
+					length = length - 2;
+					continue;
+				}
 				if (parent.hasPrevMove()) {
-					length++;
-					if (length > limit) {
-						length = length - 2;
-						continue;
-					}
 					child = parent.prevMove();
+					length++;
 					if (child.isGoal(goal)){
 						backwardPath.push(parent);
 						backwardPath.push(child);
