@@ -191,33 +191,18 @@ public class Game {
 		Board child;
 		
 		int length = 0;
-		
 		path.push(startBoard);
 		startBoard.findValidForwardMoves();
 		
 		while (!path.isEmpty()) {
-			parent = (Board) path.pop();
-			/*if (limit < 2) {
-				System.out.println("PARENT:");
-				parent.printBoard();
-				System.out.println("LENGTH: " + length + " LIMIT: " + limit);
-			}*/
+			parent = path.pop();
+			
 			if (length > limit) {
-				//System.out.println("*****");
-				/*if (length - 2 < 0)
-					length = 0;
-				else
-					length -= 2;*/
 				length--;
 				continue;
 			}
 			if (parent.hasNextMove()) {
 				child = parent.nextMove();
-				/*if (limit < 2) {
-					System.out.println("CHILD:");
-					child.printBoard();
-					System.out.println("LENGTH: " + length + " LIMIT: " + limit);
-				}*/
 				length++;
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
@@ -229,9 +214,9 @@ public class Game {
 				
 				path.push(parent);
 				path.push(child);
-				child.findValidForwardMoves();
+				if (length != limit)
+					child.findValidForwardMoves();
 			} else {
-				//System.out.println("no more moves");
 				length--;
 			}
 		}
@@ -246,7 +231,6 @@ public class Game {
 			if (biDfid(goalBoard, true, limit))
 				return true;
 			while (!halfway.isEmpty()) {
-				//System.out.println("halfway is not empty");
 				interim = halfway.pop();
 				if (biDfid(interim, false, limit))
 					return true;
@@ -255,6 +239,7 @@ public class Game {
 			}
 			
 			startBoard.clearForwardMovesList();
+			goalBoard.clearBackwardMovesList();
 			limit++;
 		}
 		return false;
@@ -269,13 +254,9 @@ public class Game {
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
 			startBoard.findValidForwardMoves();
-			
 			while (!forwardPath.isEmpty()) {
 				parent = forwardPath.pop();
-				if (length == limit) {
-					if (halfway.search(parent) == -1)
-						halfway.push(parent);
-				}
+				
 				if (length > limit) {
 					length--;
 					continue;
@@ -293,7 +274,11 @@ public class Game {
 					
 					forwardPath.push(parent);
 					forwardPath.push(child);
-					child.findValidForwardMoves();
+					if (length == limit) {
+						halfway.push(child);
+					} else {
+						child.findValidForwardMoves();
+					}
 				} else {
 					length--;
 				}
@@ -301,9 +286,10 @@ public class Game {
 		} else {							// We're searching backward
 			backwardPath.push(goalBoard);
 			goalBoard.findValidBackwardMoves();
+			
 			while (!backwardPath.isEmpty()) {
 				parent = backwardPath.pop();
-				//System.out.println("backward");
+				
 				if (length > limit) {
 					length--;
 					continue;
@@ -321,7 +307,8 @@ public class Game {
 					
 					backwardPath.push(parent);
 					backwardPath.push(child);
-					child.findValidBackwardMoves();
+					if (length != limit)
+						child.findValidBackwardMoves();
 				} else {
 					length--;
 				}

@@ -379,4 +379,8 @@ public class Board {
 	public void clearForwardMovesList() {
 		validForwardMoves.clear();
 	}
+	
+	public void clearBackwardMovesList() {
+		validBackwardMoves.clear();
+	}
 }
