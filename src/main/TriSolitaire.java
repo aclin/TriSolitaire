@@ -15,6 +15,7 @@ public class TriSolitaire {
 		startTime = System.nanoTime();
 		//if (peggy.dfsSolve()) {
 		//if (peggy.dfidSolve()) {
+		//if (peggy.backSolve()) {
 		if (peggy.biDfidSolve()) {
 			runTime = System.nanoTime() - startTime;
 			System.out.println("SOLVED!");
@@ -27,11 +28,11 @@ public class TriSolitaire {
 			}
 			while(!peggy.forwardPath.empty()) {
 				((Board) peggy.forwardPath.pop()).printBoard();
-				System.out.println("=============");
+				System.out.println("============= forward");
 			}
 			while(!peggy.backwardPath.empty()) {
 				((Board) peggy.backwardPath.pop()).printBoard();
-				System.out.println("=============");
+				System.out.println("============= backward");
 			}
 		} else {
 			System.out.println("Did not find a single peg solution");

@@ -126,6 +126,55 @@ public class Game {
 		return false;
 	}
 	
+	public boolean backSolve() {
+		int limit = 0;
+		while (limit < cutOffDepth) {
+			if (backDfid(startBoard, limit))
+				return true;
+			startBoard.clearForwardMovesList();
+			limit++;
+		}
+		return false;
+	}
+	
+	public boolean backDfid(Board goal, int limit) {
+		Board parent;
+		Board child;
+		
+		int length = 0;
+		
+		backwardPath.push(goalBoard);
+		goalBoard.findValidBackwardMoves();
+		
+		while (!backwardPath.isEmpty()) {
+			parent = backwardPath.pop();
+			//System.out.println("backward");
+			if (length > limit) {
+				length--;
+				continue;
+			}
+			if (parent.hasPrevMove()) {
+				child = parent.prevMove();
+				length++;
+				if (child.isGoal(goal)){
+					backwardPath.push(parent);
+					backwardPath.push(child);
+					return true;
+				}
+				if (backwardPath.search(child) != -1)
+					continue;
+				
+				backwardPath.push(parent);
+				backwardPath.push(child);
+				child.findValidBackwardMoves();
+			} else {
+				length--;
+			}
+		}
+		
+		return false;
+	}
+	
 	// Depth-First Iterative Deepening Search with a limit
 	public boolean dfidSolve() {
 		int limit = 0;
@@ -148,15 +197,27 @@ public class Game {
 		
 		while (!path.isEmpty()) {
 			parent = (Board) path.pop();
+			/*if (limit < 2) {
+				System.out.println("PARENT:");
+				parent.printBoard();
+				System.out.println("LENGTH: " + length + " LIMIT: " + limit);
+			}*/
 			if (length > limit) {
-				//System.out.println("Length greater than limit");
-				//System.out.println("length: " + length + " Limit: " + limit);
-				length -= 2;
+				//System.out.println("*****");
+				/*if (length - 2 < 0)
+					length = 0;
+				else
+					length -= 2;*/
+				length--;
 				continue;
 			}
 			if (parent.hasNextMove()) {
-				//System.out.println("Number of valid moves: " + parent.validMovesCount());
 				child = parent.nextMove();
+				/*if (limit < 2) {
+					System.out.println("CHILD:");
+					child.printBoard();
+					System.out.println("LENGTH: " + length + " LIMIT: " + limit);
+				}*/
 				length++;
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
@@ -170,6 +231,7 @@ public class Game {
 				path.push(child);
 				child.findValidForwardMoves();
 			} else {
+				//System.out.println("no more moves");
 				length--;
 			}
 		}
@@ -184,6 +246,7 @@ public class Game {
 			if (biDfid(goalBoard, true, limit))
 				return true;
 			while (!halfway.isEmpty()) {
+				//System.out.println("halfway is not empty");
 				interim = halfway.pop();
 				if (biDfid(interim, false, limit))
 					return true;
@@ -206,12 +269,15 @@ public class Game {
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
 			startBoard.findValidForwardMoves();
+			
 			while (!forwardPath.isEmpty()) {
 				parent = forwardPath.pop();
+				if (length == limit) {
+					if (halfway.search(parent) == -1)
+						halfway.push(parent);
+				}
 				if (length > limit) {
-					length -= 2;
-					halfway.push(parent);
-					System.out.println("forward");
+					length--;
 					continue;
 				}
 				if (parent.hasNextMove()) {
@@ -237,9 +303,9 @@ public class Game {
 			goalBoard.findValidBackwardMoves();
 			while (!backwardPath.isEmpty()) {
 				parent = backwardPath.pop();
-				System.out.println("backward");
+				//System.out.println("backward");
 				if (length > limit) {
-					length = length - 2;
+					length--;
 					continue;
 				}
 				if (parent.hasPrevMove()) {

@@ -342,11 +342,13 @@ public class Board {
 		// against the goal board. AND the boolean "match"
 		// with the previous comparison. If any of the positions
 		// don't match, then "match" will be false;
-		boolean match = true;
+		//boolean match = true;
 		for (int i=0; i<depth; i++)
 			for (int j=0; j<i+1; j++)
-				match = match && (myBoard[i][j] && goal.myBoard[i][j]);
-		return match;
+				//match = match && (myBoard[i][j] == goal.myBoard[i][j]);
+				if (myBoard[i][j] != goal.myBoard[i][j])
+					return false;
+		return true;
 	}
 	
 	public void printBoard() {
