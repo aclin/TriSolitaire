@@ -9,6 +9,7 @@ public class Game {
 	Board goalBoard;
 	
 	int goalRow, goalCol;
+	int nodeCount = 0;
 	
 	Stack<Board> path = new Stack<Board>();
 	Stack<Board> forwardPath = new Stack<Board>();
@@ -111,6 +112,7 @@ public class Game {
 			parent = (Board) path.pop();
 			if (parent.hasNextMove()) {
 				child = parent.nextMove();
+				nodeCount++;
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
 					path.push(child);
@@ -126,55 +128,6 @@ public class Game {
 		return false;
 	}
 	
-	public boolean backSolve() {
-		int limit = 0;
-		while (limit < cutOffDepth) {
-			if (backDfid(startBoard, limit))
-				return true;
-			startBoard.clearForwardMovesList();
-			limit++;
-		}
-		return false;
-	}
-	
-	public boolean backDfid(Board goal, int limit) {
-		Board parent;
-		Board child;
-		
-		int length = 0;
-		
-		backwardPath.push(goalBoard);
-		goalBoard.findValidBackwardMoves();
-		
-		while (!backwardPath.isEmpty()) {
-			parent = backwardPath.pop();
-			//System.out.println("backward");
-			if (length > limit) {
-				length--;
-				continue;
-			}
-			if (parent.hasPrevMove()) {
-				child = parent.prevMove();
-				length++;
-				if (child.isGoal(goal)){
-					backwardPath.push(parent);
-					backwardPath.push(child);
-					return true;
-				}
-				if (backwardPath.search(child) != -1)
-					continue;
-				
-				backwardPath.push(parent);
-				backwardPath.push(child);
-				child.findValidBackwardMoves();
-			} else {
-				length--;
-			}
-		}
-		
-		return false;
-	}
-	
 	// Depth-First Iterative Deepening Search with a limit
 	public boolean dfidSolve() {
 		int limit = 0;
@@ -183,6 +136,8 @@ public class Game {
 				return true;
 			startBoard.clearForwardMovesList();
 			limit++;
+			System.out.println("Node count this iteration: " + nodeCount);
+			nodeCount = 0;
 		}
 		return false;
 	}
@@ -193,6 +148,7 @@ public class Game {
 		int length = 0;
 		path.push(startBoard);
 		startBoard.findValidForwardMoves();
+		startBoard.symmetricPrune();
 		
 		while (!path.isEmpty()) {
 			parent = path.pop();
@@ -204,6 +160,7 @@ public class Game {
 			if (parent.hasNextMove()) {
 				child = parent.nextMove();
 				length++;
+				nodeCount++;
 				if (child.isGoal(goalRow, goalCol)){
 					path.push(parent);
 					path.push(child);
@@ -254,6 +211,7 @@ public class Game {
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
 			startBoard.findValidForwardMoves();
+			startBoard.symmetricPrune();
 			while (!forwardPath.isEmpty()) {
 				parent = forwardPath.pop();
 				
@@ -336,12 +294,15 @@ public class Game {
 		path = tmp;
 	}
 	
-	
 	public void printValidMoves() {
 		startBoard.printValidMoves();
 	}
 	
 	public void printBoard() {
 		startBoard.printBoard();
+	}
+	
+	public int nodesVisited() {
+		return nodeCount;
 	}
 }

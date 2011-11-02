@@ -14,12 +14,12 @@ public class TriSolitaire {
 		
 		startTime = System.nanoTime();
 		//if (peggy.dfsSolve()) {
-		//if (peggy.dfidSolve()) {
-		//if (peggy.backSolve()) {
-		if (peggy.biDfidSolve()) {
+		if (peggy.dfidSolve()) {
+		//if (peggy.biDfidSolve()) {
 			runTime = System.nanoTime() - startTime;
 			System.out.println("SOLVED!");
 			System.out.println("Time required: " + runTime);
+			System.out.println("# of nodes visited: " + peggy.nodesVisited());
 			System.out.println("Solution path:");
 			//peggy.reversePath();
 			while(!peggy.path.empty()) {

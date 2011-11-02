@@ -383,4 +383,26 @@ public class Board {
 	public void clearBackwardMovesList() {
 		validBackwardMoves.clear();
 	}
+	
+	// Pruning a node due to symmetry
+	public void symmetricPrune() {
+		/*boolean match = true;
+		if (!myBoard[0][0] || ) {
+			for (int i=1; i<depth; i++)
+				for (int j=0; j<i+1; j++)
+					match = match && myBoard[i][j];
+		}
+		
+		if (match)
+			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+		*/
+		if (!myBoard[0][0])
+			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+		
+		if (!myBoard[4][2]) {
+			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+		}
+			
+	}
 }
