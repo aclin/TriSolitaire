@@ -77,56 +77,6 @@ public class Board {
 		return validForwardMoves.size() > 0;
 	}
 	
-	public boolean hasNextMove2() {
-		if (emptySlots.isEmpty())
-			return false;
-		currentRow = emptySlots.pop();
-		currentCol = emptySlots.pop();
-		if (!(currentRow-2 < 0 || currentCol > currentRow-2)) {				// Check that NE move is not outside of the board
-			if (myBoard[currentRow-1][currentCol]) {		// Check NE adjacent peg exists for move to exist
-				if (myBoard[currentRow-2][currentCol]) {
-					nextMove = new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol);
-					validForwardMoves.add(new Board(this).forwardMove(currentRow-2, currentCol, currentRow, currentCol));
-				}
-			}
-		}
-		if (!(j+2 > i)) {				// Check the E move is not outside of the board
-			if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
-				if (myBoard[i][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j+2, i, j));
-				}
-			}
-		}
-		if (!(i+2 > depth-1 || j+2 > i+2)) {	// Check the SE move is not outside of the board
-			if (myBoard[i+1][j+1]){			// Check SE adjacent peg exists for move to exist
-				if (myBoard[i+2][j+2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j+2, i, j));
-				}
-			}
-		}
-		if (!(i+2 > depth-1)) {			// Check the SW move is not outside of the board
-			if (myBoard[i+1][j]) {		// Check SW adjacent peg exists for move to exist
-				if (myBoard[i+2][j]) {
-					validForwardMoves.add(new Board(this).forwardMove(i+2, j, i, j));
-				}
-			}
-		}
-		if (!(j-2 < 0)) {				// Check the W move is not outside of the board
-			if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
-				if (myBoard[i][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
-				}
-			}
-		}
-		if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
-			if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
-				if (myBoard[i-2][j-2]) {
-					validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
-				}
-			}
-		}
-	}
-	
 	public boolean hasPrevMove() {
 		return validBackwardMoves.size() > 0;
 	}
@@ -372,6 +322,14 @@ public class Board {
 				}
 	}
 	
+	public boolean equals(Board other) {
+		for (int i=0; i<depth; i++)
+			for (int j=0; j<i+1; j++)
+				if (myBoard[i][j] != other.myBoard[i][j])
+					return false;
+		return true;
+	}
+	
 	public boolean isGoal(int gRow, int gCol) {
 		// Flip the boolean at the goal position
 		// Then OR everything with a false value.
@@ -392,11 +350,13 @@ public class Board {
 		// against the goal board. AND the boolean "match"
 		// with the previous comparison. If any of the positions
 		// don't match, then "match" will be false;
-		boolean match = true;
+		//boolean match = true;
 		for (int i=0; i<depth; i++)
 			for (int j=0; j<i+1; j++)
-				match = match && (myBoard[i][j] && goal.myBoard[i][j]);
-		return match;
+				//match = match && (myBoard[i][j] == goal.myBoard[i][j]);
+				if (myBoard[i][j] != goal.myBoard[i][j])
+					return false;
+		return true;
 	}
 	
 	public void printBoard() {
@@ -416,7 +376,7 @@ public class Board {
 	}
 	
 	public void printValidMoves() {
-		findValidForwardMoves();
+		//findValidForwardMoves();
 		System.out.println("Valid moves from the above configuration are:");
 		for (int i=0; i<validForwardMoves.size(); i++) {
 			validForwardMoves.elementAt(i).printBoard();
@@ -427,4 +387,33 @@ public class Board {
 	public void clearForwardMovesList() {
 		validForwardMoves.clear();
 	}
+	
+	public void clearBackwardMovesList() {
+		validBackwardMoves.clear();
+	}
+	
+	// Pruning a node due to symmetry
+	public void symmetricPrune() {
+		/*boolean match = true;
+		if (!myBoard[0][0] || ) {
+			for (int i=1; i<depth; i++)
+				for (int j=0; j<i+1; j++)
+					match = match && myBoard[i][j];
+		}
+		
+		if (match)
+			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+		*/
+		if (!myBoard[0][0])
+			validForwardMoves.removeElementAt(1);
+		
+		if (depth > 4) {
+			if (!myBoard[4][2]) {
+				validForwardMoves.removeElementAt(0);
+				validForwardMoves.removeElementAt(0);
+			}
+		}
+		//printValidMoves();
+	}
+	
 }
