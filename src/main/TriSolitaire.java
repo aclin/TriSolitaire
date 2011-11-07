@@ -5,6 +5,7 @@ import java.util.*;
 public class TriSolitaire {
 	
 	public static void main(String args[]) {
+		
 		long startTime, runTime;
 		Game peggy = new Game(args);
 		System.out.println("Your original board:");
@@ -58,5 +59,15 @@ public class TriSolitaire {
 			break;
 		}
 		
+		/*Hashtable<String, Board> ht = new Hashtable<String, Board>();
+		Board b1 = new Board(0, 0, 4);
+		Board b2 = new Board(0, 0, 4);
+		ht.put(b1.hash(), b1);
+		if (ht.containsKey(b2.hash()))
+			System.out.println("contains(): true");
+		if (ht.containsValue(b2))
+			System.out.println("containsValue(): true");
+		System.out.println("Hash: " + b1.hash());
+		*/
 	}
 }

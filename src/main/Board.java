@@ -405,15 +405,29 @@ public class Board {
 			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
 		*/
 		if (!myBoard[0][0])
-			validForwardMoves.removeElementAt(1);
+			validForwardMoves.removeElementAt(0);
 		
 		if (depth > 4) {
 			if (!myBoard[4][2]) {
-				validForwardMoves.removeElementAt(0);
-				validForwardMoves.removeElementAt(0);
+				//validForwardMoves.removeElementAt(0);
+				//validForwardMoves.removeElementAt(0);
+				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
 			}
 		}
 		//printValidMoves();
 	}
 	
+	public String hash() {
+		String s = "";
+		for (int i=0; i<depth; i++) {
+			for (int j=0; j<i+1; j++) {
+				if (myBoard[i][j])
+					s = s.concat("1");
+				else
+					s = s.concat("0");
+			}
+		}
+		return s;
+	}
 }

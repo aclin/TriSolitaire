@@ -11,6 +11,7 @@ public class Game {
 	int goalRow, goalCol;
 	int nodeCount = 0;
 	
+	Hashtable<String, Board> visited = new Hashtable<String, Board>();
 	Stack<Board> path = new Stack<Board>();
 	Stack<Board> forwardPath = new Stack<Board>();
 	Stack<Board> backwardPath = new Stack<Board>();
@@ -164,6 +165,7 @@ public class Game {
 			startBoard.clearForwardMovesList();
 			limit++;
 			nodeCount = 0;
+			visited.clear();
 		}
 		return false;
 	}
@@ -174,6 +176,7 @@ public class Game {
 		
 		int length = 0;
 		path.push(startBoard);
+		visited.put(startBoard.hash(), startBoard);
 		startBoard.findValidForwardMoves();
 		startBoard.symmetricPrune();
 		
@@ -194,11 +197,17 @@ public class Game {
 					path.push(child);
 					return true;
 				}
-				if (path.search(child) != -1)
-					continue;
-				
+				//if (path.search(child) != -1)
+					//continue;
 				path.push(parent);
+				if (visited.containsKey(child.hash())) {
+					length--;
+					continue;
+				}
+				
+				
 				path.push(child);
+				visited.put(child.hash(), child);
 				if (length != limit)
 					child.findValidForwardMoves();
 			} else {
@@ -227,6 +236,7 @@ public class Game {
 			goalBoard.clearBackwardMovesList();
 			limit++;
 			nodeCount = 0;
+			visited.clear();
 		}
 		return false;
 	}
@@ -239,6 +249,7 @@ public class Game {
 		
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
+			visited.put(startBoard.hash(), startBoard);
 			startBoard.findValidForwardMoves();
 			startBoard.symmetricPrune();
 			while (!forwardPath.isEmpty()) {
@@ -257,11 +268,17 @@ public class Game {
 						forwardPath.push(child);
 						return true;
 					}
-					if (forwardPath.search(child) != -1)
-						continue;
+					//if (forwardPath.search(child) != -1)
+						//continue;
 					
 					forwardPath.push(parent);
+					if (visited.containsKey(child.hash())) {
+						length--;
+						continue;
+					}
+					
 					forwardPath.push(child);
+					visited.put(child.hash(), child);
 					if (length == limit) {
 						halfway.push(child);
 					} else {
@@ -273,6 +290,7 @@ public class Game {
 			}
 		} else {							// We're searching backward
 			backwardPath.push(goalBoard);
+			visited.put(goalBoard.hash(), goalBoard);
 			goalBoard.findValidBackwardMoves();
 			
 			while (!backwardPath.isEmpty()) {
@@ -291,11 +309,17 @@ public class Game {
 						backwardPath.push(child);
 						return true;
 					}
-					if (backwardPath.search(child) != -1)
-						continue;
+					//if (backwardPath.search(child) != -1)
+						//continue;
 					
 					backwardPath.push(parent);
+					if (visited.containsKey(child.hash())) {
+						length--;
+						continue;
+					}
+					
 					backwardPath.push(child);
+					visited.put(child.hash(), child);
 					if (length != limit)
 						child.findValidBackwardMoves();
 				} else {
