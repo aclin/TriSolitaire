@@ -322,6 +322,14 @@ public class Board {
 				}
 	}
 	
+	public boolean equals(Board other) {
+		for (int i=0; i<depth; i++)
+			for (int j=0; j<i+1; j++)
+				if (myBoard[i][j] != other.myBoard[i][j])
+					return false;
+		return true;
+	}
+	
 	public boolean isGoal(int gRow, int gCol) {
 		// Flip the boolean at the goal position
 		// Then OR everything with a false value.
@@ -368,7 +376,7 @@ public class Board {
 	}
 	
 	public void printValidMoves() {
-		findValidForwardMoves();
+		//findValidForwardMoves();
 		System.out.println("Valid moves from the above configuration are:");
 		for (int i=0; i<validForwardMoves.size(); i++) {
 			validForwardMoves.elementAt(i).printBoard();
@@ -397,12 +405,29 @@ public class Board {
 			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
 		*/
 		if (!myBoard[0][0])
-			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+			validForwardMoves.removeElementAt(1);
 		
-		if (!myBoard[4][2]) {
-			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
-			validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+		if (depth > 4) {
+			if (!myBoard[4][2]) {
+				//validForwardMoves.removeElementAt(0);
+				//validForwardMoves.removeElementAt(0);
+				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+			}
 		}
-			
+		//printValidMoves();
+	}
+	
+	public String hash() {
+		String hash = "";
+		for (int i=0; i<depth; i++) {
+			for (int j=0; j<i+1; j++) {
+				if (myBoard[i][j])
+					hash = hash.concat("1");
+				else
+					hash = hash.concat("0");
+			}
+		}
+		return hash;
 	}
 }

@@ -11,6 +11,7 @@ public class Game {
 	int goalRow, goalCol;
 	int nodeCount = 0;
 	
+	Hashtable<String, Board> visited = new Hashtable<String, Board>();
 	Stack<Board> path = new Stack<Board>();
 	Stack<Board> forwardPath = new Stack<Board>();
 	Stack<Board> backwardPath = new Stack<Board>();
@@ -22,7 +23,7 @@ public class Game {
 		try{
 			// Open the file that is the first 
 			// command line parameter
-			FileInputStream fstream = new FileInputStream(rootInput[0]);
+			FileInputStream fstream = new FileInputStream(rootInput[1]);
 			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
@@ -41,14 +42,14 @@ public class Game {
 			in.close();
 			setCutOffDepth(d);
 			startBoard = new Board(root, d);
-			if (rootInput.length > 1 && rootInput.length < 4) {
+			if (rootInput.length > 2 && rootInput.length < 5) {
 				try {
-					goalRow = Integer.parseInt(rootInput[1]);
+					goalRow = Integer.parseInt(rootInput[2]);
 					if (goalRow > d - 1 || goalRow < 0) {
 						System.out.println("Peg position outside of board");
 						System.exit(1);
 					}
-					goalCol = Integer.parseInt(rootInput[2]);
+					goalCol = Integer.parseInt(rootInput[3]);
 					if (goalCol > goalRow || goalCol < 0) {
 						System.out.println("Peg position outside of board");
 						System.exit(1);
@@ -128,25 +129,54 @@ public class Game {
 		return false;
 	}
 	
+	public boolean qDFSSolve(Board goal) {
+		Board parent;
+		Board child;
+		
+		path.push(startBoard);
+		startBoard.findValidForwardMoves();
+		
+		while (!path.isEmpty()) {
+			parent = (Board) path.pop();
+			if (parent.hasNextMove()) {
+				child = parent.nextMove();
+				nodeCount++;
+				if (child.isGoal(goal)){
+					path.push(parent);
+					path.push(child);
+					return true;
+				}
+				if (path.search(child) != -1)
+					continue;
+				path.push(parent);
+				path.push(child);
+				child.findValidForwardMoves();
+			}
+		}
+		return false;
+	}
+	
 	// Depth-First Iterative Deepening Search with a limit
 	public boolean dfidSolve() {
-		int limit = 0;
+		int limit = 1;
 		while (limit < cutOffDepth) {
 			if (dfid(limit))
 				return true;
 			startBoard.clearForwardMovesList();
 			limit++;
-			System.out.println("Node count this iteration: " + nodeCount);
 			nodeCount = 0;
+			visited.clear();
 		}
 		return false;
 	}
+	
 	public boolean dfid(int limit) {
 		Board parent;
 		Board child;
 		
 		int length = 0;
 		path.push(startBoard);
+		visited.put(startBoard.hash(), startBoard);
 		startBoard.findValidForwardMoves();
 		startBoard.symmetricPrune();
 		
@@ -157,6 +187,7 @@ public class Game {
 				length--;
 				continue;
 			}
+			
 			if (parent.hasNextMove()) {
 				child = parent.nextMove();
 				length++;
@@ -166,11 +197,17 @@ public class Game {
 					path.push(child);
 					return true;
 				}
-				if (path.search(child) != -1)
-					continue;
-				
+				//if (path.search(child) != -1)
+					//continue;
 				path.push(parent);
+				if (visited.containsKey(child.hash())) {
+					length--;
+					continue;
+				}
+				
+				
 				path.push(child);
+				visited.put(child.hash(), child);
 				if (length != limit)
 					child.findValidForwardMoves();
 			} else {
@@ -182,7 +219,7 @@ public class Game {
 	
 	// Bi-directional Depth-First Iterative Deepening Search
 	public boolean biDfidSolve() {
-		int limit = 0;
+		int limit = 1;
 		Board interim;
 		while (limit < cutOffDepth) {
 			if (biDfid(goalBoard, true, limit))
@@ -198,6 +235,8 @@ public class Game {
 			startBoard.clearForwardMovesList();
 			goalBoard.clearBackwardMovesList();
 			limit++;
+			nodeCount = 0;
+			visited.clear();
 		}
 		return false;
 	}
@@ -210,6 +249,7 @@ public class Game {
 		
 		if (forward) {						// We're searching forward
 			forwardPath.push(startBoard);
+			visited.put(startBoard.hash(), startBoard);
 			startBoard.findValidForwardMoves();
 			startBoard.symmetricPrune();
 			while (!forwardPath.isEmpty()) {
@@ -222,16 +262,23 @@ public class Game {
 				if (parent.hasNextMove()) {
 					child = parent.nextMove();
 					length++;
+					nodeCount++;
 					if (child.isGoal(goalRow, goalCol)){
 						forwardPath.push(parent);
 						forwardPath.push(child);
 						return true;
 					}
-					if (forwardPath.search(child) != -1)
-						continue;
+					//if (forwardPath.search(child) != -1)
+						//continue;
 					
 					forwardPath.push(parent);
+					if (visited.containsKey(child.hash())) {
+						length--;
+						continue;
+					}
+					
 					forwardPath.push(child);
+					visited.put(child.hash(), child);
 					if (length == limit) {
 						halfway.push(child);
 					} else {
@@ -243,6 +290,7 @@ public class Game {
 			}
 		} else {							// We're searching backward
 			backwardPath.push(goalBoard);
+			visited.put(goalBoard.hash(), goalBoard);
 			goalBoard.findValidBackwardMoves();
 			
 			while (!backwardPath.isEmpty()) {
@@ -255,16 +303,23 @@ public class Game {
 				if (parent.hasPrevMove()) {
 					child = parent.prevMove();
 					length++;
+					nodeCount++;
 					if (child.isGoal(goal)){
 						backwardPath.push(parent);
 						backwardPath.push(child);
 						return true;
 					}
-					if (backwardPath.search(child) != -1)
-						continue;
+					//if (backwardPath.search(child) != -1)
+						//continue;
 					
 					backwardPath.push(parent);
+					if (visited.containsKey(child.hash())) {
+						length--;
+						continue;
+					}
+					
 					backwardPath.push(child);
+					visited.put(child.hash(), child);
 					if (length != limit)
 						child.findValidBackwardMoves();
 				} else {
@@ -283,6 +338,15 @@ public class Game {
 		}
 		
 		//cutOffDepth -= 2;
+	}
+	
+	private boolean isInPath(Board b) {
+		Stack<Board> s = path;
+		while (!s.isEmpty()) {
+			if (s.pop().equals(b))
+				return true;
+		}
+		return false;
 	}
 	
 	public void reversePath() {
