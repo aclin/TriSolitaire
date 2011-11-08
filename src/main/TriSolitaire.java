@@ -17,6 +17,7 @@ public class TriSolitaire {
 		case 0:
 			startTime = System.nanoTime();
 			if (peggy.dfidSolve()) {
+			//if (peggy.dfsSolve()) {
 				runTime = System.nanoTime() - startTime;
 				System.out.println("SOLVED!");
 				System.out.println("Time required: " + runTime);

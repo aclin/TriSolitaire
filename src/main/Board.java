@@ -140,10 +140,10 @@ public class Board {
 			for (int j=0; j<i+1; j++) {
 				if (!((i == depth-1 && j == 0) || (i == depth-1 && j == depth-1))) {		  // Skip the corner positions
 					if (!myBoard[i][j]) {			// No peg exists at the current positions
-						if (!(i-2 < 0 || j > i-2)) {				// Check that NE move is not outside of the board
-							if (myBoard[i-1][j]) {		// Check NE adjacent peg exists for move to exist
-								if (myBoard[i-2][j]) {
-									validForwardMoves.add(new Board(this).forwardMove(i-2, j, i, j));
+						if (!(j-2 < 0)) {				// Check the W move is not outside of the board
+							if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
+								if (myBoard[i][j-2]) {
+									validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
 								}
 							}
 						}
@@ -151,6 +151,13 @@ public class Board {
 							if (myBoard[i][j+1]){		// Check E adjacent peg exists for move to exist
 								if (myBoard[i][j+2]) {
 									validForwardMoves.add(new Board(this).forwardMove(i, j+2, i, j));
+								}
+							}
+						}
+						if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
+							if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
+								if (myBoard[i-2][j-2]) {
+									validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
 								}
 							}
 						}
@@ -168,17 +175,10 @@ public class Board {
 								}
 							}
 						}
-						if (!(j-2 < 0)) {				// Check the W move is not outside of the board
-							if (myBoard[i][j-1]){		// Check W adjacent peg exists for move to exist
-								if (myBoard[i][j-2]) {
-									validForwardMoves.add(new Board(this).forwardMove(i, j-2, i, j));
-								}
-							}
-						}
-						if (!(i-2 < 0 || j-2 < 0)) {	// Check the NW move is not outside of the board
-							if (myBoard[i-1][j-1]){		// Check NW adjacent peg exists for move to exist
-								if (myBoard[i-2][j-2]) {
-									validForwardMoves.add(new Board(this).forwardMove(i-2, j-2, i, j));
+						if (!(i-2 < 0 || j > i-2)) {	// Check that NE move is not outside of the board
+							if (myBoard[i-1][j]) {		// Check NE adjacent peg exists for move to exist
+								if (myBoard[i-2][j]) {
+									validForwardMoves.add(new Board(this).forwardMove(i-2, j, i, j));
 								}
 							}
 						}
@@ -410,9 +410,12 @@ public class Board {
 		if (depth > 4) {
 			if (!myBoard[4][2]) {
 				//validForwardMoves.removeElementAt(0);
-				//validForwardMoves.removeElementAt(0);
+				//validForwardMoves.removeElementAt(1);
 				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
-				validForwardMoves.removeElementAt(validForwardMoves.size() - 1);
+				validForwardMoves.removeElementAt(validForwardMoves.size() - 2);
+			}
+			if (!myBoard[2][1]) {
+				validForwardMoves.removeElementAt(1);
 			}
 		}
 		//printValidMoves();

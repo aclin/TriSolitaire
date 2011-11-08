@@ -107,6 +107,7 @@ public class Game {
 		Board child;
 		
 		path.push(startBoard);
+		visited.put(startBoard.hash(), startBoard);
 		startBoard.findValidForwardMoves();
 		
 		while (!path.isEmpty()) {
@@ -119,10 +120,15 @@ public class Game {
 					path.push(child);
 					return true;
 				}
-				if (path.search(child) != -1)
-					continue;
+				//if (path.search(child) != -1)
+					//continue;
+				
 				path.push(parent);
+				if (visited.containsKey(child.hash()))
+					continue;
+				
 				path.push(child);
+				visited.put(child.hash(), child);
 				child.findValidForwardMoves();
 			}
 		}
