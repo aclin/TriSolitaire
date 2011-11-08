@@ -33,9 +33,9 @@ public class TriSolitaire {
 			}
 			break;
 		case 1:
-			Board b = new Board();
+			//Board b = new Board();
 			startTime = System.nanoTime();
-			if (peggy.biDfidSolve()) {
+			/*if (peggy.biDfidSolve()) {
 				runTime = System.nanoTime() - startTime;
 				System.out.println("SOLVED!");
 				System.out.println("Time required: " + runTime);
@@ -52,6 +52,25 @@ public class TriSolitaire {
 				while(!peggy.backwardPath.empty()) {
 					b = peggy.backwardPath.pop();
 					b.printBoard();
+					System.out.println("=============");
+				}
+			} else {
+				System.out.println("Did not find a single peg solution");
+			}*/
+			if (peggy.biDfidSolve2()) {
+				runTime = System.nanoTime() - startTime;
+				System.out.println("SOLVED!");
+				System.out.println("Time required: " + runTime);
+				System.out.println("# of nodes visited: " + peggy.nodesVisited());
+				System.out.println("Solution path:");
+				peggy.reverseForwardPath();
+				peggy.reverseBackwardPath();
+				while (!peggy.forwardPath.empty()) {
+					peggy.forwardPath.pop().printBoard();
+					System.out.println("=============");
+				}
+				while (!peggy.backwardPath.empty()) {
+					peggy.backwardPath.pop().printBoard();
 					System.out.println("=============");
 				}
 			} else {

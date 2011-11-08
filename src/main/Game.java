@@ -315,8 +315,6 @@ public class Game {
 						backwardPath.push(child);
 						return true;
 					}
-					//if (backwardPath.search(child) != -1)
-						//continue;
 					
 					backwardPath.push(parent);
 					if (visited.containsKey(child.hash())) {
@@ -334,6 +332,120 @@ public class Game {
 			}
 		}
 		
+		return false;
+	}
+	
+	public boolean biDfidSolve2() {
+		int limit = 1;
+		while (limit < cutOffDepth) {
+			if (biDfid2(limit))
+				return true;
+			
+			startBoard.clearForwardMovesList();
+			goalBoard.clearBackwardMovesList();
+			limit++;
+			nodeCount = 0;
+			visited.clear();
+		}
+		return false;
+	}
+	
+	public boolean biDfid2(int limit) {
+		Board parent;
+		Board child;
+		
+		int length = 0;
+		
+		forwardPath.push(startBoard);
+		visited.put(startBoard.hash(), startBoard);
+		startBoard.findValidForwardMoves();
+		startBoard.symmetricPrune();
+		
+		while (!forwardPath.isEmpty()) {
+			parent = forwardPath.pop();
+			
+			if (length > limit) {
+				length--;
+				continue;
+			}
+			if (parent.hasNextMove()) {
+				child = parent.nextMove();
+				length++;
+				nodeCount++;
+				if (child.isGoal(goalRow, goalCol)){
+					forwardPath.push(parent);
+					forwardPath.push(child);
+					return true;
+				}
+				
+				forwardPath.push(parent);
+				if (visited.containsKey(child.hash())) {
+					length--;
+					continue;
+				}
+				
+				forwardPath.push(child);
+				visited.put(child.hash(), child);
+				if (length == limit) {
+					if (backwardDfid(child, limit))
+						return true;
+					if (backwardDfid(child, limit+1))
+						return true;
+				} else {
+					child.findValidForwardMoves();
+				}
+			} else {
+				length--;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean backwardDfid(Board goal, int limit) {
+		Board parent;
+		Board child;
+		
+		int length = 0;
+		path.push(goalBoard);
+		visited.put(goalBoard.hash(), goalBoard);
+		goalBoard.findValidForwardMoves();
+		//startBoard.symmetricPrune();
+		
+		while (!backwardPath.isEmpty()) {
+			parent = backwardPath.pop();
+			
+			if (length > limit) {
+				length--;
+				continue;
+			}
+			
+			if (parent.hasNextMove()) {
+				child = parent.nextMove();
+				length++;
+				nodeCount++;
+				if (child.isGoal(goal)){
+					backwardPath.push(parent);
+					backwardPath.push(child);
+					return true;
+				}
+				//if (path.search(child) != -1)
+					//continue;
+				backwardPath.push(parent);
+				if (visited.containsKey(child.hash())) {
+					length--;
+					continue;
+				}
+				
+				
+				backwardPath.push(child);
+				visited.put(child.hash(), child);
+				if (length != limit)
+					child.findValidForwardMoves();
+			} else {
+				length--;
+			}
+		}
 		return false;
 	}
 	
@@ -362,6 +474,24 @@ public class Game {
 			tmp.push((Board) path.pop());
 		}
 		path = tmp;
+	}
+	
+	public void reverseForwardPath() {
+		Stack<Board> tmp = new Stack<Board>();
+		while (!forwardPath.empty()) {
+			// Move everything in path to tmp in reverse order
+			tmp.push(forwardPath.pop());
+		}
+		forwardPath = tmp;
+	}
+	
+	public void reverseBackwardPath() {
+		Stack<Board> tmp = new Stack<Board>();
+		while (!backwardPath.empty()) {
+			// Move everything in path to tmp in reverse order
+			tmp.push(backwardPath.pop());
+		}
+		backwardPath = tmp;
 	}
 	
 	public void printValidMoves() {
