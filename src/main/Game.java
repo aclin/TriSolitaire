@@ -120,8 +120,6 @@ public class Game {
 					path.push(child);
 					return true;
 				}
-				//if (path.search(child) != -1)
-					//continue;
 				
 				path.push(parent);
 				if (visited.containsKey(child.hash()))
@@ -129,33 +127,6 @@ public class Game {
 				
 				path.push(child);
 				visited.put(child.hash(), child);
-				child.findValidForwardMoves();
-			}
-		}
-		return false;
-	}
-	
-	public boolean qDFSSolve(Board goal) {
-		Board parent;
-		Board child;
-		
-		path.push(startBoard);
-		startBoard.findValidForwardMoves();
-		
-		while (!path.isEmpty()) {
-			parent = (Board) path.pop();
-			if (parent.hasNextMove()) {
-				child = parent.nextMove();
-				nodeCount++;
-				if (child.isGoal(goal)){
-					path.push(parent);
-					path.push(child);
-					return true;
-				}
-				if (path.search(child) != -1)
-					continue;
-				path.push(parent);
-				path.push(child);
 				child.findValidForwardMoves();
 			}
 		}
@@ -203,8 +174,7 @@ public class Game {
 					path.push(child);
 					return true;
 				}
-				//if (path.search(child) != -1)
-					//continue;
+				
 				path.push(parent);
 				if (visited.containsKey(child.hash())) {
 					length--;
@@ -220,118 +190,6 @@ public class Game {
 				length--;
 			}
 		}
-		return false;
-	}
-	
-	// Bi-directional Depth-First Iterative Deepening Search
-	public boolean biDfidSolve() {
-		int limit = 1;
-		Board interim;
-		while (limit < cutOffDepth) {
-			if (biDfid(goalBoard, true, limit))
-				return true;
-			while (!halfway.isEmpty()) {
-				interim = halfway.pop();
-				if (biDfid(interim, false, limit))
-					return true;
-				if (biDfid(interim, false, limit+1))
-					return true;
-			}
-			
-			startBoard.clearForwardMovesList();
-			goalBoard.clearBackwardMovesList();
-			limit++;
-			nodeCount = 0;
-			visited.clear();
-		}
-		return false;
-	}
-	
-	public boolean biDfid(Board goal, boolean forward, int limit) {
-		Board parent;
-		Board child;
-		
-		int length = 0;
-		
-		if (forward) {						// We're searching forward
-			forwardPath.push(startBoard);
-			visited.put(startBoard.hash(), startBoard);
-			startBoard.findValidForwardMoves();
-			startBoard.symmetricPrune();
-			while (!forwardPath.isEmpty()) {
-				parent = forwardPath.pop();
-				
-				if (length > limit) {
-					length--;
-					continue;
-				}
-				if (parent.hasNextMove()) {
-					child = parent.nextMove();
-					length++;
-					nodeCount++;
-					if (child.isGoal(goalRow, goalCol)){
-						forwardPath.push(parent);
-						forwardPath.push(child);
-						return true;
-					}
-					//if (forwardPath.search(child) != -1)
-						//continue;
-					
-					forwardPath.push(parent);
-					if (visited.containsKey(child.hash())) {
-						length--;
-						continue;
-					}
-					
-					forwardPath.push(child);
-					visited.put(child.hash(), child);
-					if (length == limit) {
-						halfway.push(child);
-					} else {
-						child.findValidForwardMoves();
-					}
-				} else {
-					length--;
-				}
-			}
-		} else {							// We're searching backward
-			backwardPath.push(goalBoard);
-			visited.put(goalBoard.hash(), goalBoard);
-			goalBoard.findValidBackwardMoves();
-			
-			while (!backwardPath.isEmpty()) {
-				parent = backwardPath.pop();
-				
-				if (length > limit) {
-					length--;
-					continue;
-				}
-				if (parent.hasPrevMove()) {
-					child = parent.prevMove();
-					length++;
-					nodeCount++;
-					if (child.isGoal(goal)){
-						backwardPath.push(parent);
-						backwardPath.push(child);
-						return true;
-					}
-					
-					backwardPath.push(parent);
-					if (visited.containsKey(child.hash())) {
-						length--;
-						continue;
-					}
-					
-					backwardPath.push(child);
-					visited.put(child.hash(), child);
-					if (length != limit)
-						child.findValidBackwardMoves();
-				} else {
-					length--;
-				}
-			}
-		}
-		
 		return false;
 	}
 	
@@ -410,7 +268,6 @@ public class Game {
 		path.push(goalBoard);
 		visited.put(goalBoard.hash(), goalBoard);
 		goalBoard.findValidForwardMoves();
-		//startBoard.symmetricPrune();
 		
 		while (!backwardPath.isEmpty()) {
 			parent = backwardPath.pop();
@@ -429,14 +286,12 @@ public class Game {
 					backwardPath.push(child);
 					return true;
 				}
-				//if (path.search(child) != -1)
-					//continue;
+				
 				backwardPath.push(parent);
 				if (visited.containsKey(child.hash())) {
 					length--;
 					continue;
 				}
-				
 				
 				backwardPath.push(child);
 				visited.put(child.hash(), child);
@@ -454,8 +309,6 @@ public class Game {
 		for (int i=1; i<=d; i++) {
 			cutOffDepth += i;
 		}
-		
-		//cutOffDepth -= 2;
 	}
 	
 	private boolean isInPath(Board b) {
